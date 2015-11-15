@@ -8,18 +8,29 @@ output:
 
 ## Loading and preprocessing the data
 ```{r}
+# Load data from zip file
 activity_data_raw <- read.csv(unz("activity.zip","activity.csv"))
+
+# Convert the dates to date objects
 activity_data_raw$date<- as.Date(activity_data_raw$date, format='%Y-%m-%d')
-activity_data <- activity_data_raw[!is.na(activity_data_raw$steps),]
+
+# It does not make sense to average over the missing valuse, but 
+# It appears to be part of the exercise, to show that the valuse 
+# change after dealing with the missing data. So I will use the raw data
+# and deal with missing values when taking the mean.
+
+#########################
+# Remove Code To remove missing data
+#activity_data <- activity_data_raw[!is.na(activity_data_raw$steps),]
 # remove extra levels associated with missing data
-activity_data$date <- factor(activity_data$date)
+#activity_data$date <- factor(activity_data$date)
 
 ```
 
 
 ## What is mean total number of steps taken per day?
 ```{r} 
-total_steps <- by(activity_data$steps, activity_data$date, sum )
+total_steps <- by(activity_data_raw$steps, activity_data_raw$date, sum, na.rm=TRUE )
 hist(total_steps, breaks=20)
 mean_steps <- mean(total_steps)
 median_steps <- median(total_steps)
@@ -30,8 +41,8 @@ The median total number of steps is `r median_steps`.
 
 ## What is the average daily activity pattern?
 ```{r}
-avg_step_pattern <- with(activity_data, tapply(steps, interval, mean))
-with(activity_data, plot(1:288, avg_step_pattern, type="l", xlab = "Time Interval", ylab = "Average Steps"))
+avg_step_pattern <- with(activity_data_raw, tapply(steps, interval, mean, na.rm=TRUE))
+with(activity_data_raw, plot(1:288, avg_step_pattern, type="l", xlab = "Time Interval", ylab = "Average Steps"))
 max_interval=as.numeric(which(avg_step_pattern==max(avg_step_pattern), arr.ind=TRUE))
 ```
 
