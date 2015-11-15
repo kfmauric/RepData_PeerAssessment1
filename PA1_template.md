@@ -43,7 +43,9 @@ The median total number of steps is 10395.
 
 ```r
 avg_step_pattern <- with(activity_data_raw, tapply(steps, interval, mean, na.rm=TRUE))
-with(activity_data_raw, plot(1:288, avg_step_pattern, type="l", xlab = "Time Interval", ylab = "Average Steps"))
+xIntervals <- unique(activity_data_raw$interval)
+with(activity_data_raw, plot(xIntervals, avg_step_pattern, type="l", 
+                             xlab = "Time Interval", ylab = "Average Steps"))
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
@@ -52,30 +54,68 @@ with(activity_data_raw, plot(1:288, avg_step_pattern, type="l", xlab = "Time Int
 max_interval=as.numeric(which(avg_step_pattern==max(avg_step_pattern), arr.ind=TRUE))
 ```
 
-The interval with the maximun number of steps on average across all days is 104  
+The interval with the maximun number of steps on average across all days is 835.    
 
 ## Imputing missing values
 
 ```r
 num_missing_vals = length(activity_data_raw[is.na(activity_data_raw$steps),1])
 missing_vals<-activity_data_raw[is.na(activity_data_raw),]
-foo <- by(missing_vals$steps, missing_vals$date, count)
 # missing vals are complete days
-# average day on each side to replace missing vals
+foo <- by(missing_vals$steps, missing_vals$date, count)
+# The missing values are completed days with no data.
+# All of the missing values for the day will be filled with an interpolated mean value for the day.
+# The filter function will be used to average the 
+# daily mean value to the left and the right of missing daily mean.
+# This is a quick and dirty interpolation between available data points
+#  xdailymean[missing] = 0.5*xdailymean[missing-1]+0.5*xdailymean[missing+1]
 dailyAve <- by(activity_data_raw$steps, activity_data_raw$date, mean)
 dailyAvePad = as.numeric(c(0,0,0,dailyAve,0,0,0))
 dailyAvePad[is.na(dailyAvePad)] <- 0
 dailyAvePadFiltered<-filter (dailyAvePad, filter = c(1/2, 0, 1/2), sides=2)
 dailyAveVec<-as.numeric(dailyAve)
-dailyAveFill=dailyAvePadFiltered[4:62]
+dailyAveFill=dailyAvePadFiltered[4:64]
 na_fill_vals <- dailyAveFill[is.na(dailyAve)]
 dailyAveVec[is.na(dailyAveVec)] <- dailyAveFill[is.na(dailyAve)]
 #generate list of dates to update
 na_dates <- unique(activity_data_raw[is.na(activity_data_raw$steps),2])
-filler_key <- data.frame(na_dates, na_fill_vals)
+activity_data_raw_update <- activity_data_raw;
+activity_data_raw_update[activity_data_raw$date==na_dates[1],1]<-na_fill_vals[1]
+activity_data_raw_update[activity_data_raw$date==na_dates[2],1]<-na_fill_vals[2]
+activity_data_raw_update[activity_data_raw$date==na_dates[3],1]<-na_fill_vals[3]
+activity_data_raw_update[activity_data_raw$date==na_dates[4],1]<-na_fill_vals[4]
+activity_data_raw_update[activity_data_raw$date==na_dates[5],1]<-na_fill_vals[5]
+activity_data_raw_update[activity_data_raw$date==na_dates[6],1]<-na_fill_vals[6]
+activity_data_raw_update[activity_data_raw$date==na_dates[7],1]<-na_fill_vals[7]
+activity_data_raw_update[activity_data_raw$date==na_dates[8],1]<-na_fill_vals[8]
+
+total_steps <- by(activity_data_raw$steps, activity_data_raw$date, sum, na.rm=TRUE )
+hist(total_steps, breaks=20)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+```r
+total_steps_update <- by(activity_data_raw_update$steps, activity_data_raw_update$date, sum, na.rm=TRUE )
+hist(total_steps_update, breaks=20)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-2.png) 
+
+```r
+mean_steps <- mean(total_steps)
+median_steps <- median(total_steps)
+
+mean_steps_update <- mean(total_steps_update)
+median_steps_update <- median(total_steps_update)
 ```
 
 The number of missing values in the inital data set is 2304.    
+The previous mean total number of steps is 9354.2295082.  
+The updated mean total number of steps is 1.0183959\times 10^{4}.  
+The previous median total number of steps is 10395.    
+The updated median total number of steps is 1.0571\times 10^{4}.  
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
