@@ -4,7 +4,12 @@ output:
   html_document:
     keep_md: true
 ---
-
+```{r, warning=FALSE, message=FALSE}
+library(plyr)
+library(lattice)
+library(reshape2)
+library(lubridate)
+```
 
 ## Loading and preprocessing the data
 ```{r}
@@ -18,13 +23,6 @@ activity_data_raw$date<- as.Date(activity_data_raw$date, format='%Y-%m-%d')
 # It appears to be part of the exercise, to show that the valuse 
 # change after dealing with the missing data. So I will use the raw data
 # and deal with missing values when taking the mean.
-
-#########################
-# Remove Code To remove missing data
-#activity_data <- activity_data_raw[!is.na(activity_data_raw$steps),]
-# remove extra levels associated with missing data
-#activity_data$date <- factor(activity_data$date)
-
 ```
 
 
@@ -50,7 +48,6 @@ The interval with the maximun number of steps on average across all days is `r m
 
 ## Imputing missing values
 ```{r}
-library(plyr) 
 num_missing_vals = length(activity_data_raw[is.na(activity_data_raw$steps),1])
 missing_vals<-activity_data_raw[is.na(activity_data_raw),]
 foo <- by(missing_vals$steps, missing_vals$date, count)
@@ -73,9 +70,6 @@ The number of missing values in the inital data set is `r num_missing_vals`.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
-library(lattice)
-library(reshape2)
-library(lubridate)
 tday <- function(x) {
   if (x<5) {
     return("weekday")

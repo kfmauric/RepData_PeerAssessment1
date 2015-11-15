@@ -1,5 +1,11 @@
 # Reproducible Research: Peer Assessment 1
 
+```r
+library(plyr)
+library(lattice)
+library(reshape2)
+library(lubridate)
+```
 
 ## Loading and preprocessing the data
 
@@ -14,12 +20,6 @@ activity_data_raw$date<- as.Date(activity_data_raw$date, format='%Y-%m-%d')
 # It appears to be part of the exercise, to show that the valuse 
 # change after dealing with the missing data. So I will use the raw data
 # and deal with missing values when taking the mean.
-
-#########################
-# Remove Code To remove missing data
-#activity_data <- activity_data_raw[!is.na(activity_data_raw$steps),]
-# remove extra levels associated with missing data
-#activity_data$date <- factor(activity_data$date)
 ```
 
 
@@ -30,7 +30,7 @@ total_steps <- by(activity_data_raw$steps, activity_data_raw$date, sum, na.rm=TR
 hist(total_steps, breaks=20)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
 mean_steps <- mean(total_steps)
@@ -46,7 +46,7 @@ avg_step_pattern <- with(activity_data_raw, tapply(steps, interval, mean, na.rm=
 with(activity_data_raw, plot(1:288, avg_step_pattern, type="l", xlab = "Time Interval", ylab = "Average Steps"))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
 ```r
 max_interval=as.numeric(which(avg_step_pattern==max(avg_step_pattern), arr.ind=TRUE))
@@ -55,14 +55,6 @@ max_interval=as.numeric(which(avg_step_pattern==max(avg_step_pattern), arr.ind=T
 The interval with the maximun number of steps on average across all days is 104  
 
 ## Imputing missing values
-
-```r
-library(plyr) 
-```
-
-```
-## Warning: package 'plyr' was built under R version 3.2.2
-```
 
 ```r
 num_missing_vals = length(activity_data_raw[is.na(activity_data_raw$steps),1])
@@ -88,32 +80,6 @@ The number of missing values in the inital data set is 2304.
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```r
-library(lattice)
-library(reshape2)
-```
-
-```
-## Warning: package 'reshape2' was built under R version 3.2.2
-```
-
-```r
-library(lubridate)
-```
-
-```
-## Warning: package 'lubridate' was built under R version 3.2.2
-```
-
-```
-## 
-## Attaching package: 'lubridate'
-## 
-## The following object is masked from 'package:plyr':
-## 
-##     here
-```
-
-```r
 tday <- function(x) {
   if (x<5) {
     return("weekday")
@@ -129,4 +95,4 @@ goo <-dcast(mdata, typeDay+interval ~ variable, fun.aggregate=mean, na.rm=TRUE)
 xyplot(goo$steps ~ goo$interval | goo$typeDay, type='l', layout=c(1,2), xlab = "Time Interval", ylab = "Average Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 

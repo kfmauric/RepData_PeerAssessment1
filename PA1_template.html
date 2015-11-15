@@ -64,6 +64,10 @@ img {
 </div>
 
 
+<pre class="r"><code>library(plyr)
+library(lattice)
+library(reshape2)
+library(lubridate)</code></pre>
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>Loading and preprocessing the data</h2>
 <pre class="r"><code># Load data from zip file
@@ -75,13 +79,7 @@ activity_data_raw$date&lt;- as.Date(activity_data_raw$date, format='%Y-%m-%d')
 # It does not make sense to average over the missing valuse, but 
 # It appears to be part of the exercise, to show that the valuse 
 # change after dealing with the missing data. So I will use the raw data
-# and deal with missing values when taking the mean.
-
-#########################
-# Remove Code To remove missing data
-#activity_data &lt;- activity_data_raw[!is.na(activity_data_raw$steps),]
-# remove extra levels associated with missing data
-#activity_data$date &lt;- factor(activity_data$date)</code></pre>
+# and deal with missing values when taking the mean.</code></pre>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level2">
 <h2>What is mean total number of steps taken per day?</h2>
@@ -102,8 +100,6 @@ with(activity_data_raw, plot(1:288, avg_step_pattern, type=&quot;l&quot;, xlab =
 </div>
 <div id="imputing-missing-values" class="section level2">
 <h2>Imputing missing values</h2>
-<pre class="r"><code>library(plyr) </code></pre>
-<pre><code>## Warning: package 'plyr' was built under R version 3.2.2</code></pre>
 <pre class="r"><code>num_missing_vals = length(activity_data_raw[is.na(activity_data_raw$steps),1])
 missing_vals&lt;-activity_data_raw[is.na(activity_data_raw),]
 foo &lt;- by(missing_vals$steps, missing_vals$date, count)
@@ -124,17 +120,6 @@ filler_key &lt;- data.frame(na_dates, na_fill_vals)</code></pre>
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
-<pre class="r"><code>library(lattice)
-library(reshape2)</code></pre>
-<pre><code>## Warning: package 'reshape2' was built under R version 3.2.2</code></pre>
-<pre class="r"><code>library(lubridate)</code></pre>
-<pre><code>## Warning: package 'lubridate' was built under R version 3.2.2</code></pre>
-<pre><code>## 
-## Attaching package: 'lubridate'
-## 
-## The following object is masked from 'package:plyr':
-## 
-##     here</code></pre>
 <pre class="r"><code>tday &lt;- function(x) {
   if (x&lt;5) {
     return(&quot;weekday&quot;)
